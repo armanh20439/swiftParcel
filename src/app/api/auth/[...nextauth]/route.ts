@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectMongoDB } from "../../../../../lib/mongodb";
 import User from "../../../../../models/user";
+import GoogleProvider from "next-auth/providers/google"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,6 +15,7 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials) {
+        // console.log("google_id",process.env.GOOGLE_CLIENT_ID)
         // 🔥 FIX 1: credentials undefined check
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Missing email or password");
@@ -47,7 +49,11 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Failed to authorize user");
         }
       },
-    }),
+    }),GoogleProvider({
+      clientId:process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret:process.env.GOOGLE_CLIENT_SECRET as string,
+      
+    })
   ],
 
   session: {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono , Urbanist} from "next/font/google";
+import { Geist, Geist_Mono, Urbanist } from "next/font/google";
 import "aos/dist/aos.css";
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -16,7 +16,7 @@ const urbanist = Urbanist({
   subsets: ['latin'],
   display: 'swap',
   // Specify the weights you plan to use, e.g., 400, 700
-  weight: ['400', '700', '900'], 
+  weight: ['400', '700', '900'],
   variable: '--font-urbanist', // Define the CSS variable
 });
 
@@ -45,8 +45,10 @@ export default function RootLayout({
       <body
         className={`  max-w-7xl mx-auto ${geistSans.variable} ${geistMono.variable} ${urbanist.variable} antialiased`}
       >
-        <Navbar></Navbar>
-        <main><AuthProvider>{children}</AuthProvider></main>
+        <AuthProvider>
+          <Navbar></Navbar>
+          <main>{children}</main>
+        </AuthProvider>
         <Footer></Footer>
       </body>
     </html>

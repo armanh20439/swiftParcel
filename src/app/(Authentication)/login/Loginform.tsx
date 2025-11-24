@@ -5,6 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 const Loginform = () => {
   type FormValues = {
     email: string;
@@ -106,9 +107,9 @@ const [loginError, setLoginError] = React.useState("");
       {/* Register Link */}
       <p className="text-center text-sm text-gray-500">
         Don’t have an account?{" "}
-        <a href="#" className="text-lime-600 hover:underline">
+        <Link href="/register" className="text-lime-600 hover:underline">
           Register
-        </a>
+        </Link>
       </p>
 
       {/* Divider */}
@@ -119,7 +120,7 @@ const [loginError, setLoginError] = React.useState("");
       </div>
 
       {/* Google Button */}
-      <button
+      <button onClick={()=>signIn("google")}
         type="button"
         className="w-full flex items-center justify-center gap-2 border py-2 rounded-md hover:bg-gray-100 transition"
       >

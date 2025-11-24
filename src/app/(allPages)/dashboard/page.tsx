@@ -1,13 +1,15 @@
-import { getServerSession } from "next-auth";
+"use client";
+
+import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import UserInfo from "./UserInfo";
 
-const Dashboard = async () => {
-  const serSession = await getServerSession();
+const Dashboard = () => {
+  const { data: session, status } = useSession();
 
-  console.log("session:", serSession);
+  if (status === "loading") return <p>Loading...</p>;
 
-  if (!serSession) {
+  if (!session) {
     redirect("/login");
   }
 
