@@ -4,16 +4,16 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import UserInfo from "./UserInfo";
 
-const Dashboard = () => {
+const userDetails = () => {
   const { data: session, status } = useSession();
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <span className="loading loading-spinner text-accent"></span>;
 
   if (!session) {
-    redirect("/login");
+    redirect(`/login?callbackUrl=/userDetails`);
   }
 
   return <UserInfo />;
 };
 
-export default Dashboard;
+export default userDetails;

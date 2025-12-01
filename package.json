@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "aos": "^3.0.0-beta.6",
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
@@ -24,6 +25,7 @@
     "react-icons": "^5.5.0",
     "react-leaflet": "^5.0.0",
     "react-responsive-carousel": "^3.2.23",
+    "sweetalert2": "^11.26.3",
     "swiper": "^12.0.3"
   },
   "devDependencies": {
