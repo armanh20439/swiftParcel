@@ -120,9 +120,7 @@ const Coverage: React.FC<Props> = ({ dataUrl = "/data/coverageData.json" }) => {
                   <div className="text-sm">{center.covered_area.join(", ")}</div>
                   {center.flowchart && (
                     <div className="mt-2">
-                      <a href={center.flowchart} target="_blank" rel="noreferrer" className="text-xs text-lime-600 underline">
-                        Open flowchart
-                      </a>
+                      
                     </div>
                   )}
                 </div>

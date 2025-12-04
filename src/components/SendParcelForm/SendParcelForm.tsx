@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
+
 import { useSession } from "next-auth/react";
 
 type CoverageItem = {
@@ -18,12 +19,14 @@ type CoverageItem = {
 
 const SendParcel = () => {
   const { data: session } = useSession();
+  
 
-  const {
+ const {
     register,
     handleSubmit,
     control,
     setValue,
+    reset,                    // এটা যোগ করো
     formState: { errors },
   } = useForm();
 
@@ -121,15 +124,18 @@ const SendParcel = () => {
     .then((response) => response.json())
     .then((data) => {
       console.log("SERVER RESPONSE:", data);
-
+      
       Swal.fire("Success", "Parcel saved & proceeding to payment!", "success");
+      reset();
+
+     
     })
     .catch((error) => {
       console.error("SAVE ERROR:", error);
       Swal.fire("Error", "Failed to save parcel.", "error");
     });
 }
-
+reset()
       
     });
   };
@@ -244,7 +250,7 @@ const SendParcel = () => {
               className="input input-bordered w-full"
             />
 
-            <label className="label">Email</label>
+            <label className="label mt-4">Email</label>
             <input
               {...register("receiverEmail", { required: "Email required" })}
               className="input input-bordered w-full"

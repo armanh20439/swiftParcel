@@ -16,7 +16,7 @@ export default function ParcelCard({ parcel }: Props) {
 
         <div className="text-right">
           <p className="text-sm text-gray-500">Status</p>
-          <p className="badge badge-outline">{parcel.delivery_status ?? parcel.status ?? "Pending"}</p>
+          <p className="badge badge-outline">{parcel.delivery_status ?? parcel.status ?? "paid"}</p>
         </div>
       </div>
 

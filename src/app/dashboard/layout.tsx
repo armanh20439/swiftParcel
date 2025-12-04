@@ -23,7 +23,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard | Profast",
+  title: "Dashboard | Swift-Parcel",
 };
 
 export default function DashboardLayout({

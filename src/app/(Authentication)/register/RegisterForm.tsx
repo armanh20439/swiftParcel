@@ -94,7 +94,7 @@ const RegisterForm = () => {
           {/* Header */}
           <h1 className="text-2xl font-bold text-center mb-2">Create an account</h1>
           <p className="text-sm text-gray-500 text-center mb-6">
-            Start selling or tracking parcels with Profast.
+            Start selling or tracking parcels with Swift Parcel.
           </p>
 
           {/* Form */}

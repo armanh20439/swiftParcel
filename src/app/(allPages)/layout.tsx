@@ -31,7 +31,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Profast",
+  title: "Swift-Parcel",
   description: "Fast & reliable delivery service",
 };
 
