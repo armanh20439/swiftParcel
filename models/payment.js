@@ -1,24 +1,23 @@
 import mongoose from "mongoose";
 
-const PaymentSchema = new mongoose.Schema({
+const paymentSchema = new mongoose.Schema({
   parcelId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Parcel",
+    required: true,
   },
-  trackingId: String,
-  email: String,
+  sessionId: { type: String, required: true },
+  paymentIntentId: { type: String },
+  amount: { type: Number, required: true },
 
-  amount: Number,
-  currency: String,
-
-  paymentStatus: String,
-  stripeSessionId: String,
-
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  status: {
+    type: String,
+    enum: ["paid", "failed", "pending"],
+    default: "pending",
   },
+
+  createdAt: { type: Date, default: Date.now },
 });
 
 export default mongoose.models.Payment ||
-  mongoose.model("Payment", PaymentSchema);
+  mongoose.model("Payment", paymentSchema);

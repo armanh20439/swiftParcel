@@ -9,7 +9,7 @@ export interface ParcelType {
   trackingId: string;
   parcelName: string;
   cost: number;
-  payment_status: string;
+  payment_status: "paid" | "unpaid";
   delivery_status: string;
 }
 
@@ -19,17 +19,24 @@ export default function MyParcels() {
   const [loading, setLoading] = useState(true);
 
   const email = session?.user?.email;
-useEffect(() => {
-    if (!session?.user?.email) return;
 
-    fetch(`/api/parcels?email=${session.user.email}`)
-      .then((res) => res.json())
-      .then((data) => setParcels(data.parcels || []));
-  }, [session]);
-  // ✅ Handle payment → create checkout session
+  // Load parcels
+  useEffect(() => {
+    if (!email) return;
+
+    const loadParcels = async () => {
+      const res = await fetch(`/api/parcels?email=${email}`);
+      const data = await res.json();
+      setParcels(data.parcels || []);
+      setLoading(false);
+    };
+
+    loadParcels();
+  }, [email]);
+
+  // Pay button
   const handlePayment = async (id: string) => {
     try {
-      
       const res = await fetch("/api/payments/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,16 +46,16 @@ useEffect(() => {
       const data = await res.json();
 
       if (data.url) {
-        window.location.href = data.url; // 🔥 Redirect to Stripe
+        window.location.href = data.url;
       } else {
         Swal.fire("Error", data.error || "Payment failed!", "error");
       }
-    } catch (err) {
+    } catch (error) {
       Swal.fire("Error", "Payment error occurred!", "error");
     }
   };
 
-  // ❌ Delete parcel
+  // Delete
   const handleDelete = async (id: string) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -70,21 +77,6 @@ useEffect(() => {
       Swal.fire("Error", data.message, "error");
     }
   };
-
-  // 📦 Load user's parcels
-  useEffect(() => {
-    if (!email) return;
-
-    const fetchParcels = async () => {
-      const res = await fetch(`/api/parcels?email=${email}`);
-      const data = await res.json();
-
-      setParcels(data.parcels || []);
-      setLoading(false);
-    };
-
-    fetchParcels();
-  }, [email]);
 
   if (loading) return <p>Loading...</p>;
 
@@ -124,7 +116,7 @@ useEffect(() => {
                 </span>
               </td>
 
-              <td className="flex gap-2">
+              <td className="flex gap-2 items-center">
                 <button className="btn btn-info btn-sm">View</button>
 
                 {p.payment_status === "unpaid" && (
@@ -135,13 +127,9 @@ useEffect(() => {
                     Pay
                   </button>
                 )}
-                {p.payment_status === "paid" && (
-              <div className="text-green-600 font-bold mt-3">
-                ✔ Payment Completed
-              </div>
-            )}
 
                 
+
                 <button
                   onClick={() => handleDelete(p._id)}
                   className="btn btn-error btn-sm"

@@ -8,7 +8,7 @@ export const config = {
     bodyParser: false,
   },
 };
-
+console.log("stripe secret key:-------",process.env.STRIPE_SECRET_KEY)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
