@@ -78,7 +78,11 @@ export default function MyParcels() {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div className="flex items-center justify-center"><span className="loading loading-ball loading-xs"></span>
+    <span className="loading loading-ball loading-sm"></span>
+    <span className="loading loading-ball loading-md"></span>
+    <span className="loading loading-ball loading-lg"></span>
+    <span className="loading loading-ball loading-xl"></span></div>;
 
   return (
     <div>
@@ -106,11 +110,10 @@ export default function MyParcels() {
 
               <td>
                 <span
-                  className={`badge ${
-                    p.payment_status === "paid"
+                  className={`badge ${p.payment_status === "paid"
                       ? "badge-success"
                       : "badge-warning"
-                  }`}
+                    }`}
                 >
                   {p.payment_status}
                 </span>
@@ -128,7 +131,7 @@ export default function MyParcels() {
                   </button>
                 )}
 
-                
+
 
                 <button
                   onClick={() => handleDelete(p._id)}

@@ -11,7 +11,7 @@ export default function DashboardNav() {
       <ul className="menu p-4 w-80 bg-base-100 text-base-content">
         
         <li><Link href="/dashboard/my-parcels">📦 My Parcels</Link></li>
-        <li><Link href="/dashboard/create">➕ Create Parcel</Link></li>
+        <li><Link href="/dashboard/payment-history">💸Payment History</Link></li>
         <li><Link href="/dashboard/profile">👤 Profile</Link></li>
       </ul>
     </div>

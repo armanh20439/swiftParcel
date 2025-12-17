@@ -37,22 +37,22 @@ export default function DashboardLayout({
         className={`max-w-7xl mx-auto ${geistSans.variable} ${geistMono.variable} ${urbanist.variable} antialiased`}
       >
         <AuthProvider>
-          {/* ===================== */}
-          {/* MAIN DASHBOARD LAYOUT */}
-          {/* ===================== */}
+          {/* MAIN DASHBOARD WRAPPER */}
           <div className="drawer lg:drawer-open min-h-screen">
-
-            {/* Drawer Toggle for Mobile */}
-            <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
+            {/* Mobile Drawer Toggle */}
+            <input
+              id="dashboard-drawer"
+              type="checkbox"
+              className="drawer-toggle"
+            />
 
             {/* CONTENT AREA */}
             <div className="drawer-content flex flex-col">
-              
-              {/* TOP NAVBAR (both desktop + mobile) */}
+              {/* TOP NAV */}
               <div className="w-full bg-base-100 shadow p-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Dashboard</h1>
 
-                {/* Mobile menu button */}
+                {/* Mobile Menu Button */}
                 <label
                   htmlFor="dashboard-drawer"
                   className="btn btn-primary drawer-button lg:hidden"
@@ -61,7 +61,7 @@ export default function DashboardLayout({
                 </label>
               </div>
 
-              {/* CHILDREN CONTENT */}
+              {/* PAGE CONTENT */}
               <main className="p-5 bg-base-200 flex-1 rounded-lg mt-4">
                 {children}
               </main>

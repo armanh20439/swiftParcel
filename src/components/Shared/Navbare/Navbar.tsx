@@ -2,7 +2,7 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from 'next/link'
-import React from 'react'
+
 import BrandLogo from '../Logo/BrandLogo'
 
 const Navbar = () => {
@@ -41,7 +41,7 @@ const Navbar = () => {
             </div >
             <div className="navbar-end">
                 {
-                    (status === "loading") ? <span className="loading loading-infinity loading-xl"></span> : <div className="navbar-end">
+                    (status === "loading") ? <span className="loading loading-infinity loading-md"></span> : <div className="navbar-end">
                         {
                             session?.user?.email ? <Link href={"/"} onClick={() => signOut()} className="btn btn-primary text-black">Log Out</Link> : <Link href={"/login"} className="btn btn-primary text-black">Log In</Link>
                         }

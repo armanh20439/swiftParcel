@@ -65,7 +65,7 @@ const SendParcel = () => {
     let total = 0;
 
     if (isDocument) {
-      base = isSameDistrict ? 60 : 80;
+      base = isSameDistrict ? 80 : 100;
       total = base;
     } else {
       base = isSameDistrict ? 110 : 150;
