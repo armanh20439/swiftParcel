@@ -29,14 +29,15 @@ export const authOptions: NextAuthOptions = {
 
           if (!user) return null;
 
-          // যদি গুগল দিয়ে অ্যাকাউন্ট খোলা থাকে কিন্তু পাসওয়ার্ড না থাকে
+          // If user exists but registered via Google (no password)
           if (!user.password) {
-            throw new Error("Please log in with Google.");
+            throw new Error("This account is linked with Google. Please login with Google.");
           }
 
           const passwordsMatch = await bcrypt.compare(credentials.password, user.password);
           if (!passwordsMatch) return null;
 
+          // Return user data for JWT
           return {
             id: user._id.toString(),
             name: user.name,
@@ -52,47 +53,53 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    // ১. গুগল সাইন-ইন এর সময় ডাটাবেসে ডাটা সেভ করা
+    // 1. Handle Google Sign-In and Database Sync
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
           await connectMongoDB();
-          const userExists = await User.findOne({ email: user.email });
+          let userInDB = await User.findOne({ email: user.email });
 
-          if (!userExists) {
-            // নতুন ইউজার হলে ডাটাবেসে সেভ হবে
+          if (!userInDB) {
+            // Register new Google user in DB
             const newUser = await User.create({
               name: user.name,
               email: user.email,
-              role: "user", // ডিফল্ট রোল
+              role: "user", // Default role
+              // password remains empty/undefined as required: false in model
             });
-            // টোকেনে পাঠানোর জন্য আইডি সেট করা
             user.id = newUser._id.toString();
             (user as any).role = newUser.role;
           } else {
-            // পুরাতন ইউজার হলে তার আইডি অবজেক্টে সেট করা
-            user.id = userExists._id.toString();
-            (user as any).role = userExists.role;
+            // Map existing user data to session
+            user.id = userInDB._id.toString();
+            (user as any).role = userInDB.role;
           }
           return true;
         } catch (error) {
-          console.log("Error checking/saving user:", error);
-          return false; // এখান থেকে false দিলে Access Denied দেখাবে
+          console.error("Error during Google Sign In:", error);
+          return false; // Triggers AccessDenied
         }
       }
       return true;
     },
 
-    // ২. টোকেনে আইডি ও রোল সেভ করা
-    async jwt({ token, user }) {
+    // 2. Persist Data into JWT Token
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
       }
+      
+      // Update token if session is updated manually (e.g., after becoming a rider)
+      if (trigger === "update" && session?.role) {
+        token.role = session.role;
+      }
+      
       return token;
     },
 
-    // ৩. সেশনে আইডি ও রোল এভেলেবল করা
+    // 3. Make Token Data Available in Client Session
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.id;

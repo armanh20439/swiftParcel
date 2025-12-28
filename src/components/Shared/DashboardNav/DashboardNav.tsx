@@ -22,6 +22,8 @@ const role = (session?.user as any)?.role;
             <li><Link href="/dashboard/admin">📊 Admin Overview</Link></li>
             <li><Link href="/dashboard/admin/all-parcels">📦 Manage All Parcels</Link></li>
             <li><Link href="/dashboard/admin/all-users">👥 All Users</Link></li>
+            <li><Link href="/dashboard/admin/pending-rider">🚴 Pending Riders</Link></li>
+            <li><Link href="/dashboard/admin/active-rider">🚴 Active Riders</Link></li>
             <div className="divider"></div>
           </>
         )}

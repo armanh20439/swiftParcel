@@ -9,12 +9,16 @@ const Navbar = () => {
     const { data: session, status } = useSession();
 
     const navItem = <>
-        <li><Link href="/">Home</Link></li>
-        <li><Link href="/about">About Us</Link></li>
+        {
+            !session?.user?.email && <><li><Link href="/">Home</Link></li>
+        <li><Link href="/about">About Us</Link></li></>
+        }
         <li><Link href="/coverage">Coverage</Link></li>
         <li><Link href="/sendParcel">Send A Parcel</Link></li>
+        
         {
-            session?.user?.email&&<li><Link href="/dashboard">Dashboard</Link></li>
+            session?.user?.email&&<><li><Link href="/be-a-rider">Be A Rider</Link></li>
+            <li><Link href="/dashboard">Dashboard</Link></li></>
         }
 
 
