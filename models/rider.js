@@ -4,11 +4,11 @@ const riderSchema = new Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // User মডেলের সাথে সম্পর্ক
+      ref: "User", 
       required: true,
     },
     name: { type: String, required: true },
-    email: {type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
     age: { type: Number, required: true },
     region: { type: String, required: true },
     district: { type: String, required: true },
@@ -20,6 +20,12 @@ const riderSchema = new Schema(
       type: String,
       default: "pending",
       enum: ["pending", "approved", "rejected"],
+    },
+    withdrawnAmount: { type: Number, default: 0 },
+    workStatus: {
+      type: String,
+      default: "available",
+      enum: ["available", "in-delivery"],
     },
   },
   { timestamps: true }

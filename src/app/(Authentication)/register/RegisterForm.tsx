@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
-import { signIn } from "next-auth/react"; // ১. signIn ইম্পোর্ট করুন
+import { signIn } from "next-auth/react"; // 
 
 type FormValues = {
   name: string;
@@ -30,17 +30,17 @@ const RegisterForm = () => {
     }
   }, [alertMsg]);
 
-  // ২. গুগল লগইন হ্যান্ডলার
+  // 2. google login functionality
   const handleGoogleSignUp = async () => {
     
     try {
-      // এটি সরাসরি ইউজারকে গুগল লগইন পেজে নিয়ে যাবে
-      // সফল লগইনের পর আমাদের route.ts এর signIn কলব্যাক ডাটাবেসে ডাটা সেভ করবে
+      
+      // after login successful data will save in database
       await signIn("google", { callbackUrl: "/dashboard",redirect: true, }); 
       
     } catch (error) {
       console.error("Google Signin Error:", error);
-      setAlertMsg("গুগল সাইন-ইন করতে সমস্যা হয়েছে।");
+      setAlertMsg("Invalid Google SignIN");
     }
   };
 
@@ -98,7 +98,7 @@ const RegisterForm = () => {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* ... (বাকি ইনপুট ফিল্ডগুলো আগের মতই থাকবে) ... */}
+            
             <div>
               <label className="block text-sm font-medium text-gray-700">Full name</label>
               <input
@@ -146,7 +146,7 @@ const RegisterForm = () => {
               <div className="flex-1 h-px bg-gray-300" />
             </div>
 
-            {/* ৩. গুগল বাটন আপডেট করা হয়েছে */}
+            
             <button
               type="button"
               className="w-full flex items-center justify-center gap-2 border py-2 rounded-md hover:bg-gray-100 transition"

@@ -28,7 +28,7 @@ const ParcelSchema = new mongoose.Schema({
 
   trackingId: String,
   createdByEmail: String,
-  createdAt: Date,
+  createdAt: { type: Date, default: Date.now },
 
   delivery_status: {
     type: String,
@@ -41,7 +41,18 @@ const ParcelSchema = new mongoose.Schema({
   },
 
   stripeSessionId: String,
-});
 
-export default mongoose.models.Parcel ||
-  mongoose.model("Parcel", ParcelSchema);
+  riderId: { type: String, default: null },
+  riderInfo: {
+    name: String,
+    email: String,
+  },
+  
+  // 🔥 গুরুত্বপূর্ণ: ড্যাশবোর্ডে টাকা এবং তারিখ দেখানোর জন্য এই ফিল্ডগুলো লাগবে
+  riderEarnings: { type: Number, default: 0 }, 
+  assignedAt: Date,
+  pickedUpAt: Date,
+  deliveredAt: Date,
+}, { timestamps: true });
+
+export default mongoose.models.Parcel || mongoose.model("Parcel", ParcelSchema);

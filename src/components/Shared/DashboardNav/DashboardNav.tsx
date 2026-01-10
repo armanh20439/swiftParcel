@@ -20,10 +20,11 @@ const role = (session?.user as any)?.role;
           <>
             <li className="menu-title text-lime-600">Admin Menu</li>
             <li><Link href="/dashboard/admin">📊 Admin Overview</Link></li>
-            <li><Link href="/dashboard/admin/all-parcels">📦 Manage All Parcels</Link></li>
+            <li><Link href="/dashboard/admin/parcel-management">📦 Assign Riders</Link></li>
             <li><Link href="/dashboard/admin/all-users">👥 All Users</Link></li>
             <li><Link href="/dashboard/admin/pending-rider">🚴 Pending Riders</Link></li>
             <li><Link href="/dashboard/admin/active-rider">🚴 Active Riders</Link></li>
+            <li><Link href="/dashboard/admin/cashout-management">Cashout Management</Link></li>
             <div className="divider"></div>
           </>
         )}
@@ -33,6 +34,14 @@ const role = (session?.user as any)?.role;
           <>
             <li><Link href="/dashboard/my-parcels">📦 My Parcels</Link></li>
             <li><Link href="/dashboard/payment-history">💸 Payment History</Link></li>
+          </>
+        )}
+
+        {role === "rider" && (
+          <>
+            <li><Link href="/dashboard/rider/my-deliveries">📦 My Deliveries</Link></li>
+            <li><Link href="/dashboard/rider/completed-deliveries">📦 Completed-deliveries</Link></li>
+            {/* <li><Link href="/dashboard/rider/payment-history">💸 Payment History</Link></li> */}
           </>
         )}
 

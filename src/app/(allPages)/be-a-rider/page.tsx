@@ -64,7 +64,7 @@ const BeARider = () => {
     }
   }, [status, router]);
 
-  // 4. Watch Region to filter District (Cascading Dropdown)
+  // 4. Watch Region to filter District
   const selectedRegion = useWatch({ control, name: "region" });
   const regions = [...new Set(serviceCenters.map((c) => c.region))];
 
@@ -75,9 +75,10 @@ const BeARider = () => {
   const onSubmit = async (data: any) => {
     const riderApplication = {
       ...data,
-      userId: (session?.user as any)?.id, // Ensure ID is passed
-      email: session?.user?.email, // Double check email is passed
+      userId: (session?.user as any)?.id, 
+      email: session?.user?.email, 
       status: "pending",
+      workStatus: "available", // 🔥 মডেলে আপডেট করার জন্য ডিফল্ট ভ্যালু যোগ করা হলো
     };
 
     Swal.fire({
@@ -118,7 +119,6 @@ const BeARider = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="max-w-4xl w-full bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
         
-        {/* Page Header */}
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-[#00302E] mb-4">Be a Rider</h1>
           <p className="text-gray-500 text-lg">
@@ -128,12 +128,10 @@ const BeARider = () => {
 
         <hr className="mb-10 border-gray-100" />
 
-        {/* Application Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <h2 className="text-2xl font-semibold text-[#00302E] mb-6">Tell us about yourself</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Name */}
             <div className="form-control">
               <label className="label font-medium">Your Name</label>
               <input
@@ -144,7 +142,6 @@ const BeARider = () => {
               {errors.name && <span className="text-red-500 text-xs">{errors.name.message as string}</span>}
             </div>
 
-            {/* Age */}
             <div className="form-control">
               <label className="label font-medium">Your age</label>
               <input
@@ -155,7 +152,6 @@ const BeARider = () => {
               />
             </div>
 
-            {/* Email (Read Only) */}
             <div className="form-control">
               <label className="label font-medium">Your Email</label>
               <input
@@ -165,7 +161,6 @@ const BeARider = () => {
               />
             </div>
 
-            {/* Region Selector */}
             <div className="form-control">
               <label className="label font-medium">Your Region</label>
               <select 
@@ -179,7 +174,6 @@ const BeARider = () => {
               </select>
             </div>
 
-            {/* District Selector (Dependent on Region) */}
             <div className="form-control">
               <label className="label font-medium">Your District</label>
               <select 
@@ -194,7 +188,6 @@ const BeARider = () => {
               </select>
             </div>
 
-            {/* NID */}
             <div className="form-control">
               <label className="label font-medium">NID No</label>
               <input 
@@ -204,7 +197,6 @@ const BeARider = () => {
               />
             </div>
 
-            {/* Contact */}
             <div className="form-control">
               <label className="label font-medium">Contact</label>
               <input 
@@ -214,7 +206,6 @@ const BeARider = () => {
               />
             </div>
 
-            {/* Bike Registration */}
             <div className="form-control">
               <label className="label font-medium">Bike Registration Number</label>
               <input 
@@ -224,20 +215,16 @@ const BeARider = () => {
               />
             </div>
 
-
-                <div className="form-control">
+            <div className="form-control">
               <label className="label font-medium">Which wire-house you want to work?</label>
               <input 
                 {...register("wirehouse", { required: "Warehouse selection required" })} 
                 className="input input-bordered w-full" 
-                placeholder="Dhaka Main Warehouse"
+                placeholder="e.g. Dhaka Main Warehouse"
               />
             </div>
-
-            
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-[#C8E46E] hover:bg-[#b8d45e] text-[#00302E] font-bold py-4 rounded-xl shadow-lg transition-all border-none mt-8"

@@ -22,26 +22,32 @@ export async function POST(req) {
   }
 }
 
-// GET USER PARCELS -------------------------
+// GET PARCELS (Supports both User and Admin) -------------------------
 export async function GET(req) {
   try {
     await connectMongoDB();
 
     const email = req.nextUrl.searchParams.get("email");
 
-    if (!email) {
-      return NextResponse.json(
-        { message: "Email is required" },
-        { status: 400 }
-      );
+    let parcels;
+
+    if (email) {
+      // 1. If email exists: Fetch parcels for a specific user (User Dashboard)
+      parcels = await Parcel.find({ createdByEmail: email }).sort({
+        createdAt: -1,
+      });
+    } else {
+      // 2. If NO email exists: Fetch ALL parcels (Admin Management)
+      parcels = await Parcel.find().sort({
+        createdAt: -1,
+      });
     }
 
-    const parcels = await Parcel.find({ createdByEmail: email }).sort({
-      createdAt: -1,
-    });
-
-    return NextResponse.json({ parcels }, { status: 200 });
+    // Return the array directly so your frontend fetch (.json()) gets the array
+    return NextResponse.json(parcels, { status: 200 });
+    
   } catch (error) {
+    console.error("FETCH ERROR:", error);
     return NextResponse.json(
       { message: "Failed to fetch parcels", error: error.message },
       { status: 500 }
