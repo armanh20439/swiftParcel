@@ -56,7 +56,7 @@ export async function PATCH(req) {
       const isSameDistrict = senderDist === receiverDist;
       
       // আর্নিং পার্সেন্টেজ নির্ধারণ
-      const earningsPercentage = isSameDistrict ? 0.80 : 0.50;
+      const earningsPercentage = isSameDistrict ? 0.80 : 0.30;
       
       // কস্ট নিশ্চিত করে ক্যালকুলেট করা
       const parcelCost = Number(parcel.cost) || 0;

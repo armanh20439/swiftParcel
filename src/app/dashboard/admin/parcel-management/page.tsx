@@ -11,7 +11,7 @@ const ParcelManagement = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            // ১. পার্সেল ফেচ করা (ইমেইল ছাড়া সব পার্সেল আসবে)
+            // 1. Fetch Parcels
             const parcelRes = await fetch("/api/parcels");
             if (!parcelRes.ok) throw new Error("Parcel fetch failed");
             const parcelData = await parcelRes.json();
@@ -22,7 +22,7 @@ const ParcelManagement = () => {
             );
             setParcels(readyParcels);
 
-            // ২. একটিভ রাইডার ফেচ করা
+            // 2. Fetch Active Riders
             const riderRes = await fetch("/api/rider-applications");
             if (!riderRes.ok) throw new Error("Rider fetch failed");
             const riderData = await riderRes.json();
@@ -41,32 +41,32 @@ const ParcelManagement = () => {
     }, []);
 
     const handleAssign = async (parcelId: string, riderJson: string) => {
-  if (!riderJson) return;
-  const rider = JSON.parse(riderJson); // ড্রপডাউন থেকে পুরো রাইডার অবজেক্টটি নিন
+        if (!riderJson) return;
+        const rider = JSON.parse(riderJson);
 
-  try {
-    const res = await fetch("/api/admin/parcels/assign", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        parcelId: parcelId,
-        riderId: rider._id,      // রাইডারের আইডি
-        riderName: rider.name,   // রাইডারের নাম
-        riderEmail: rider.email, // রাইডারের ইমেইল
-      }),
-    });
+        try {
+            const res = await fetch("/api/admin/parcels/assign", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    parcelId: parcelId,
+                    riderId: rider._id,
+                    riderName: rider.name,
+                    riderEmail: rider.email,
+                }),
+            });
 
-    if (res.ok) {
-      toast.success("Rider Assigned and Data Updated!");
-      fetchData(); // আপনার ডাটা রিফ্রেশ ফাংশন
-    } else {
-      const error = await res.json();
-      toast.error(error.message);
-    }
-  } catch (err) {
-    toast.error("Network error!");
-  }
-};
+            if (res.ok) {
+                toast.success("Rider Assigned successfully!");
+                fetchData(); 
+            } else {
+                const error = await res.json();
+                toast.error(error.message);
+            }
+        } catch (err) {
+            toast.error("Network error!");
+        }
+    };
 
     if (loading) return <div className="p-10 text-center font-bold">Connecting to Database...</div>;
 
@@ -80,48 +80,61 @@ const ParcelManagement = () => {
                     <thead className="bg-gray-50 text-gray-700">
                         <tr>
                             <th>Tracking ID</th>
-                            <th>Destination</th>
+                            <th>Pickup (Sender)</th>
+                            <th>Destination (Receiver)</th>
                             <th>Parcel Name</th>
-                            <th>Assign Rider</th>
+                            <th>Assign Area Rider</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {parcels.map((parcel: any) => (
-                            <tr key={parcel._id} className="border-b hover:bg-gray-50 transition">
-                                <td className="font-mono text-sm font-bold text-blue-600">
-                                    {parcel.trackingId}
-                                </td>
-                                <td>
-                                    <div className="font-medium">{parcel.receiverDistrict}</div>
-                                    <div className="text-xs text-gray-400">{parcel.receiverAddress}</div>
-                                </td>
-                                <td>{parcel.parcelName}</td>
-                                <td>
-                                    <select
-                                        onChange={(e) => handleAssign(parcel._id, e.target.value)}
-                                        className="select select-bordered select-sm w-full max-w-xs"
-                                        defaultValue=""
-                                    >
-                                        <option value="" disabled>Select a Rider</option>
-                                        {riders.map((rider: any) => (
-                                            <option
-                                                key={rider._id}
-                                                value={JSON.stringify(rider)}
-                                                disabled={rider.workStatus === "in-delivery"} // 🚫 বিজি হলে ডিজেবল থাকবে
-                                            >
-                                                {rider.name} {rider.workStatus === "in-delivery" ? "(Busy)" : `(${rider.district})`}
+                        {parcels.map((parcel: any) => {
+                            // 🔥 Logic: Filter riders who belong to the parcel's sender district
+                            const localRiders = riders.filter((r: any) => 
+                                (r.district || "").toLowerCase().trim() === (parcel.senderDistrict || "").toLowerCase().trim()
+                            );
+
+                            return (
+                                <tr key={parcel._id} className="border-b hover:bg-gray-50 transition">
+                                    <td className="font-mono text-sm font-bold text-blue-600">
+                                        {parcel.trackingId}
+                                    </td>
+                                    <td>
+                                        <div className="font-bold text-orange-600">{parcel.senderDistrict}</div>
+                                        <div className="text-xs text-gray-400">Pickup Area</div>
+                                    </td>
+                                    <td>
+                                        <div className="font-medium">{parcel.receiverDistrict}</div>
+                                        <div className="text-xs text-gray-400">{parcel.receiverAddress}</div>
+                                    </td>
+                                    <td>{parcel.parcelName}</td>
+                                    <td>
+                                        <select
+                                            onChange={(e) => handleAssign(parcel._id, e.target.value)}
+                                            className="select select-bordered select-sm w-full max-w-xs"
+                                            defaultValue=""
+                                        >
+                                            <option value="" disabled>
+                                                {localRiders.length > 0 ? "Select local rider" : "No riders in this district"}
                                             </option>
-                                        ))}
-                                    </select>
-                                </td>
-                            </tr>
-                        ))}
+                                            {localRiders.map((rider: any) => (
+                                                <option
+                                                    key={rider._id}
+                                                    value={JSON.stringify(rider)}
+                                                    disabled={rider.workStatus === "in-delivery"}
+                                                >
+                                                    {rider.name} {rider.workStatus === "in-delivery" ? "(Busy)" : ""}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
                 {parcels.length === 0 && (
                     <div className="p-20 text-center text-gray-400">
-                        No parcels are currently waiting for assignment. <br />
-                        (Parcels must be <b>Paid</b> and <b>Not Collected</b>)
+                        No parcels are currently waiting for assignment.
                     </div>
                 )}
             </div>

@@ -14,6 +14,12 @@ export interface ParcelType {
   assignedAt?: string;
   pickedUpAt?: string;
   deliveredAt?: string;
+  // 🔥 রাইডারের তথ্য দেখানোর জন্য এই ফিল্ডগুলো যুক্ত করা হয়েছে
+  riderInfo?: {
+    name: string;
+    email: string;
+  };
+  riderPhone?: string; // ডাটাবেস থেকে রাইডারের ফোন নম্বর
 }
 
 export default function MyParcels() {
@@ -21,7 +27,6 @@ export default function MyParcels() {
   const [parcels, setParcels] = useState<ParcelType[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Load parcels from API
   useEffect(() => {
     const email = session?.user?.email;
     if (status !== "authenticated" || !email) return;
@@ -30,7 +35,6 @@ export default function MyParcels() {
       try {
         const res = await fetch(`/api/parcels?email=${email}`);
         const data = await res.json();
-        // Since API returns the array directly, we use data
         setParcels(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Fetch Error:", error);
@@ -42,18 +46,16 @@ export default function MyParcels() {
     loadParcels();
   }, [session, status]);
 
-  // 🔥 2. Real-time Tracking Modal Logic
-  const handleTrack = (parcel: ParcelType) => {
+  // 🔥 রিয়েল-টাইম ট্র্যাকিং এবং রাইডার ইনফো লজিক
+  const handleTrack = (parcel: any) => {
     const statuses = ["not_collected", "rider-assigned", "transit", "delivered"];
     const currentIndex = statuses.indexOf(parcel.delivery_status);
 
-    // Determines CSS class based on your current status index
     const getStepClass = (index: number) => {
-      if (index <= currentIndex) return "step-success"; // Completed or Current
-      return ""; // Future steps
+      if (index <= currentIndex) return "step-success"; 
+      return ""; 
     };
 
-    // Determine the relevant time to show in the modal
     let lastUpdateLabel = "Waiting for pickup...";
     let updateTime = "";
 
@@ -67,6 +69,24 @@ export default function MyParcels() {
       lastUpdateLabel = "Delivered on:";
       updateTime = parcel.deliveredAt ? new Date(parcel.deliveredAt).toLocaleString() : "Recently";
     }
+
+    // রাইডার অ্যাসাইন হলে তার নাম ও ফোন নম্বর দেখানোর জন্য HTML স্ট্রিং
+    const riderDetailsHtml = parcel.riderInfo?.name ? `
+      <div class="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-xl text-left">
+        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-2">Assigned Rider Info</p>
+        <div class="flex items-center gap-3">
+          <div class="avatar placeholder">
+            <div class="bg-blue-600 text-white rounded-full w-8">
+              <span>${parcel.riderInfo.name.charAt(0)}</span>
+            </div>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-gray-800">Name: ${parcel.riderInfo.name}</p>
+            <p class="text-xs text-blue-700 font-medium">${parcel.riderInfo.email || "Contact via App"}</p>
+          </div>
+        </div>
+      </div>
+    ` : "";
 
     Swal.fire({
       title: `Tracking ID: ${parcel.trackingId}`,
@@ -89,6 +109,7 @@ export default function MyParcels() {
             <p class="text-[10px] text-gray-500 mt-2 uppercase tracking-widest">
                 <b>${lastUpdateLabel}</b> ${updateTime}
             </p>
+            ${riderDetailsHtml}
           </div>
         </div>
       `,
@@ -97,7 +118,6 @@ export default function MyParcels() {
     });
   };
 
-  // 3. Payment Handler
   const handlePayment = async (id: string) => {
     try {
       const res = await fetch("/api/payments/create-checkout", {
@@ -116,7 +136,6 @@ export default function MyParcels() {
     }
   };
 
-  // 4. Delete Handler
   const handleDelete = async (id: string) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",

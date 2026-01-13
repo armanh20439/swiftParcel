@@ -13,6 +13,7 @@ export async function GET(req) {
       return NextResponse.json({ message: "Email is required" }, { status: 400 });
     }
 
+    // ডাটাবেস থেকে রাইডারকে খুঁজে বের করা
     const rider = await Rider.findOne({ email });
 
     if (!rider) {

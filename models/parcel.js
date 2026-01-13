@@ -7,6 +7,7 @@ const ParcelSchema = new mongoose.Schema({
 
   senderName: String,
   senderEmail: String,
+  senderPhone: String, // Added sender phone number
   senderRegion: String,
   senderDistrict: String,
   senderAddress: String,
@@ -14,6 +15,7 @@ const ParcelSchema = new mongoose.Schema({
 
   receiverName: String,
   receiverEmail: String,
+  receiverPhone: String, // Added receiver phone number
   receiverRegion: String,
   receiverDistrict: String,
   receiverAddress: String,
@@ -48,7 +50,6 @@ const ParcelSchema = new mongoose.Schema({
     email: String,
   },
   
-  // 🔥 গুরুত্বপূর্ণ: ড্যাশবোর্ডে টাকা এবং তারিখ দেখানোর জন্য এই ফিল্ডগুলো লাগবে
   riderEarnings: { type: Number, default: 0 }, 
   assignedAt: Date,
   pickedUpAt: Date,

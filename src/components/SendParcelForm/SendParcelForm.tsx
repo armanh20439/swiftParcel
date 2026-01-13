@@ -35,12 +35,14 @@ const SendParcel = () => {
       parcelWeight: "",
       senderName: "",
       senderEmail: "",
+      senderPhone: "", // Added
       senderRegion: "",
       senderDistrict: "",
       senderAddress: "",
       pickupInstruction: "",
       receiverName: "",
       receiverEmail: "",
+      receiverPhone: "", // Added
       receiverRegion: "",
       receiverDistrict: "",
       receiverAddress: "",
@@ -97,7 +99,6 @@ const SendParcel = () => {
 
     const trackingId = "TRK-" + crypto.randomUUID().slice(0, 8).toUpperCase();
 
-    // 🔥 Added default rider fields so they exist in DB for future updates
     const parcelData = {
       ...data,
       cost: total,
@@ -108,16 +109,15 @@ const SendParcel = () => {
       delivery_status: "not_collected",
       costBreakdown: { base, extra, total },
       
-      // Default placeholder fields for Rider Management
       riderId: null,
       riderInfo: {
         name: "",
         email: "",
-         assignedAt: null,
-        pickedUpAt: null,
-        deliveredAt: null
       },
       assignedAt: null,
+      pickedUpAt: null,
+      deliveredAt: null,
+      riderEarnings: 0 // Added default
     };
 
     // Confirm price breakdown with user
@@ -158,8 +158,7 @@ const SendParcel = () => {
               showConfirmButton: false
             });
 
-            reset(); // Clear the form
-            
+            reset();
             setTimeout(() => {
               router.push("/dashboard/my-parcels"); 
             }, 2000);
@@ -180,7 +179,6 @@ const SendParcel = () => {
       <h2 className="text-4xl font-bold mb-10 text-gray-800">Send A Parcel</h2>
 
       <form onSubmit={handleSubmit(handleSendParcel)} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-        {/* Radio Selection */}
         <div className="flex gap-6 mb-8">
           <label className="label cursor-pointer flex gap-2">
             <input
@@ -203,7 +201,6 @@ const SendParcel = () => {
           </label>
         </div>
 
-        {/* Parcel Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
           <div>
             <label className="label font-semibold">Parcel Name</label>
@@ -231,7 +228,6 @@ const SendParcel = () => {
           </div>
         </div>
 
-        {/* Details Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           {/* Sender Column */}
           <div className="space-y-4">
@@ -249,6 +245,14 @@ const SendParcel = () => {
               {...register("senderEmail", { required: "Email required" })}
               className="input input-bordered w-full"
               defaultValue={session?.user?.email || ""}
+            />
+
+            {/* Added Sender Phone */}
+            <label className="label font-medium">Phone Number</label>
+            <input
+              {...register("senderPhone", { required: "Phone number required" })}
+              className="input input-bordered w-full"
+              placeholder="01XXXXXXXXX"
             />
 
             <label className="label font-medium">Sender Region</label>
@@ -292,6 +296,14 @@ const SendParcel = () => {
             <input
               {...register("receiverEmail", { required: "Email required" })}
               className="input input-bordered w-full"
+            />
+
+            {/* Added Receiver Phone */}
+            <label className="label font-medium">Phone Number</label>
+            <input
+              {...register("receiverPhone", { required: "Phone number required" })}
+              className="input input-bordered w-full"
+              placeholder="01XXXXXXXXX"
             />
 
             <label className="label font-medium">Receiver Region</label>
