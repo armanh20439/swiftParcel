@@ -3,29 +3,47 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import ChatBox from "@/components/Chat/ChatBox"; // Ensure you have created this component
 
 export interface ParcelType {
   _id: string;
   trackingId: string;
   parcelName: string;
+  parcelType: string;
+  parcelWeight: number;
   cost: number;
   payment_status: "paid" | "unpaid";
   delivery_status: string;
+  senderName: string;
+  senderPhone: string;
+  senderDistrict: string;
+  senderAddress: string;
+  receiverName: string;
+  receiverPhone: string;
+  receiverDistrict: string;
+  receiverAddress: string;
+  costBreakdown?: {
+    base: number;
+    extra: number;
+    total: number;
+  };
   assignedAt?: string;
   pickedUpAt?: string;
   deliveredAt?: string;
-  // 🔥 রাইডারের তথ্য দেখানোর জন্য এই ফিল্ডগুলো যুক্ত করা হয়েছে
   riderInfo?: {
     name: string;
     email: string;
   };
-  riderPhone?: string; // ডাটাবেস থেকে রাইডারের ফোন নম্বর
+  riderPhone?: string; 
 }
 
 export default function MyParcels() {
   const { data: session, status } = useSession();
   const [parcels, setParcels] = useState<ParcelType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeChat, setActiveChat] = useState<ParcelType | null>(null);
 
   useEffect(() => {
     const email = session?.user?.email;
@@ -46,15 +64,64 @@ export default function MyParcels() {
     loadParcels();
   }, [session, status]);
 
-  // 🔥 রিয়েল-টাইম ট্র্যাকিং এবং রাইডার ইনফো লজিক
-  const handleTrack = (parcel: any) => {
+  // 1. Digital Receipt Generator
+  const downloadInvoice = (parcel: ParcelType) => {
+    const doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.setTextColor(0, 48, 46); 
+    doc.text("SwiftParcel Invoice", 105, 20, { align: "center" });
+
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 28, { align: "center" });
+
+    doc.setDrawColor(200);
+    doc.rect(14, 35, 182, 30); 
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(`Tracking ID: ${parcel.trackingId}`, 20, 45);
+    doc.text(`Payment Status: ${parcel.payment_status.toUpperCase()}`, 20, 52);
+    doc.text(`Delivery Status: ${parcel.delivery_status.replace('-', ' ').toUpperCase()}`, 20, 59);
+
+    autoTable(doc, {
+      startY: 75,
+      head: [['Sender Details', 'Receiver Details']],
+      body: [
+        [
+          `Name: ${parcel.senderName}\nPhone: ${parcel.senderPhone}\nDistrict: ${parcel.senderDistrict}\nAddress: ${parcel.senderAddress}`,
+          `Name: ${parcel.receiverName}\nPhone: ${parcel.receiverPhone}\nDistrict: ${parcel.receiverDistrict}\nAddress: ${parcel.receiverAddress}`
+        ]
+      ],
+      theme: 'striped',
+      headStyles: { fillStyle: 'fill', fillColor: [0, 48, 46] },
+    });
+
+    const isDocument = parcel.parcelType === "document";
+    const weight = parcel.parcelWeight || 0;
+    const baseCharge = parcel.costBreakdown?.base || 0;
+    const extraCharge = parcel.costBreakdown?.extra || 0;
+    
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 10,
+      head: [['Description', 'Calculation Details', 'Amount']],
+      body: [
+        [`Parcel: ${parcel.parcelName}`, `Type: ${isDocument ? "Document" : "Non-Document"}\nWeight: ${weight} KG`, `--`],
+        ["Base Charge", isDocument ? "Fixed rate" : "Up to 3 KG", `${baseCharge} TK`],
+        ["Extra Weight", weight > 3 ? `${(weight - 3).toFixed(1)} KG extra` : "No extra", `${extraCharge} TK`]
+      ],
+      foot: [['', 'Total Amount:', `${parcel.cost} TK`]],
+      footStyles: { fillColor: [200, 228, 110], textColor: [0, 48, 46] },
+      theme: 'grid'
+    });
+
+    doc.save(`Receipt_${parcel.trackingId}.pdf`);
+  };
+
+  // 2. Real-time Tracking Modal
+  const handleTrack = (parcel: ParcelType) => {
     const statuses = ["not_collected", "rider-assigned", "transit", "delivered"];
     const currentIndex = statuses.indexOf(parcel.delivery_status);
-
-    const getStepClass = (index: number) => {
-      if (index <= currentIndex) return "step-success"; 
-      return ""; 
-    };
+    const getStepClass = (index: number) => index <= currentIndex ? "step-success" : "";
 
     let lastUpdateLabel = "Waiting for pickup...";
     let updateTime = "";
@@ -70,26 +137,22 @@ export default function MyParcels() {
       updateTime = parcel.deliveredAt ? new Date(parcel.deliveredAt).toLocaleString() : "Recently";
     }
 
-    // রাইডার অ্যাসাইন হলে তার নাম ও ফোন নম্বর দেখানোর জন্য HTML স্ট্রিং
     const riderDetailsHtml = parcel.riderInfo?.name ? `
       <div class="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-xl text-left">
         <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-2">Assigned Rider Info</p>
         <div class="flex items-center gap-3">
           <div class="avatar placeholder">
-            <div class="bg-blue-600 text-white rounded-full w-8">
-              <span>${parcel.riderInfo.name.charAt(0)}</span>
-            </div>
+            <div class="bg-blue-600 text-white rounded-full w-8"><span>${parcel.riderInfo.name.charAt(0)}</span></div>
           </div>
           <div>
-            <p class="text-sm font-bold text-gray-800">Name: ${parcel.riderInfo.name}</p>
-            <p class="text-xs text-blue-700 font-medium">${parcel.riderInfo.email || "Contact via App"}</p>
+            <p class="text-sm font-bold text-gray-800">${parcel.riderInfo.name}</p>
+            <p class="text-xs text-blue-700 font-medium">${parcel.riderPhone || "Contact via Chat"}</p>
           </div>
         </div>
-      </div>
-    ` : "";
+      </div>` : "";
 
     Swal.fire({
-      title: `Tracking ID: ${parcel.trackingId}`,
+      title: `Tracking: ${parcel.trackingId}`,
       html: `
         <div class="py-4 font-sans">
           <ul class="steps steps-vertical lg:steps-horizontal w-full text-xs">
@@ -98,21 +161,12 @@ export default function MyParcels() {
             <li class="step ${getStepClass(2)}">Transit</li>
             <li class="step ${getStepClass(3)}">Delivered</li>
           </ul>
-          
           <div class="mt-8 text-left p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-            <p class="text-sm">
-                <b>Status:</b> 
-                <span class="badge badge-primary ml-2 capitalize">
-                    ${parcel.delivery_status.replace('-', ' ')}
-                </span>
-            </p>
-            <p class="text-[10px] text-gray-500 mt-2 uppercase tracking-widest">
-                <b>${lastUpdateLabel}</b> ${updateTime}
-            </p>
+            <p class="text-sm"><b>Status:</b> <span class="badge badge-primary ml-2 capitalize">${parcel.delivery_status.replace('-', ' ')}</span></p>
+            <p class="text-[10px] text-gray-500 mt-2 uppercase"><b>${lastUpdateLabel}</b> ${updateTime}</p>
             ${riderDetailsHtml}
           </div>
-        </div>
-      `,
+        </div>`,
       confirmButtonText: "Close",
       confirmButtonColor: "#00302E",
     });
@@ -126,42 +180,33 @@ export default function MyParcels() {
         body: JSON.stringify({ parcelId: id }),
       });
       const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        Swal.fire("Error", data.error || "Payment failed!", "error");
-      }
+      if (data.url) window.location.href = data.url;
     } catch (error) {
-      Swal.fire("Error", "Payment error occurred!", "error");
+      Swal.fire("Error", "Payment error!", "error");
     }
   };
 
   const handleDelete = async (id: string) => {
     const confirm = await Swal.fire({
-      title: "Are you sure?",
-      text: "This parcel will be permanently deleted!",
+      title: "Delete Parcel?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
       confirmButtonColor: "#EF4444",
-      cancelButtonColor: "#374151",
     });
 
-    if (!confirm.isConfirmed) return;
-
-    try {
-      const res = await fetch(`/api/parcels/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setParcels((prev) => prev.filter((p) => p._id !== id));
-        Swal.fire("Deleted", "Parcel deleted", "success");
-      }
-    } catch (error) {
-      Swal.fire("Error", "Network error occurred", "error");
+    if (confirm.isConfirmed) {
+      try {
+        const res = await fetch(`/api/parcels/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setParcels((prev) => prev.filter((p) => p._id !== id));
+          Swal.fire("Deleted", "", "success");
+        }
+      } catch (error) { console.error(error); }
     }
   };
 
   if (loading) return (
-    <div className="flex h-64 items-center justify-center gap-1">
+    <div className="flex h-64 items-center justify-center">
       <span className="loading loading-ball loading-lg text-[#C8E46E]"></span>
     </div>
   );
@@ -178,7 +223,7 @@ export default function MyParcels() {
               <th>Tracking ID</th>
               <th>Parcel Name</th>
               <th>Cost</th>
-              <th>Payment Status</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -189,19 +234,29 @@ export default function MyParcels() {
                   <td>{i + 1}</td>
                   <td className="font-mono text-sm font-bold text-blue-600">{p.trackingId}</td>
                   <td>{p.parcelName}</td>
-                  <td>{p.cost} TK</td>
+                  <td className="font-bold">{p.cost} TK</td>
                   <td>
                     <span className={`badge p-3 font-semibold ${p.payment_status === "paid" ? "badge-success" : "badge-warning text-white"}`}>
                       {p.payment_status}
                     </span>
                   </td>
                   <td className="flex gap-2 items-center">
-                    <button 
-                      onClick={() => handleTrack(p)} 
-                      className="btn btn-info btn-sm text-white"
-                    >
-                      Track
-                    </button>
+                    <button onClick={() => handleTrack(p)} className="btn btn-info btn-sm text-white">Track</button>
+                    
+                    {p.payment_status === "paid" && (
+                      <button onClick={() => downloadInvoice(p)} className="btn btn-success btn-sm text-white">Receipt</button>
+                    )}
+
+                    {/* Chat Button: Enabled once a rider is assigned */}
+                    {p.riderInfo?.email && (
+                       <button 
+                        onClick={() => setActiveChat(p)} 
+                        className="btn btn-ghost btn-sm text-[#00302E] border-gray-200"
+                        title="Chat with Rider"
+                       >
+                         💬 Chat
+                       </button>
+                    )}
 
                     {p.payment_status === "unpaid" && (
                       <button onClick={() => handlePayment(p._id)} className="btn btn-primary btn-sm">Pay</button>
@@ -212,13 +267,21 @@ export default function MyParcels() {
                 </tr>
               ))
             ) : (
-              <tr>
-                <td colSpan={6} className="text-center py-20 text-gray-400">You haven't sent any parcels yet.</td>
-              </tr>
+              <tr><td colSpan={6} className="text-center py-20 text-gray-400">No parcels found.</td></tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Floating Chat Component */}
+      {activeChat && (
+        <ChatBox 
+          parcelId={activeChat._id}
+          senderEmail={session?.user?.email}
+          receiverEmail={activeChat.riderInfo?.email}
+          onClose={() => setActiveChat(null)}
+        />
+      )}
     </div>
   );
 }

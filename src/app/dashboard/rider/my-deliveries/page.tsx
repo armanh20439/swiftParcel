@@ -3,13 +3,15 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
+import ChatBox from "@/components/Chat/ChatBox"; // Ensure this component is created
 
 const RiderDashboard = () => {
   const { data: session } = useSession();
   const [allParcels, setAllParcels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeChat, setActiveChat] = useState<any>(null);
 
-  // ১. রাইডারের পার্সেল ডেটা ফেচ করা
+  // 1. Fetch Rider-specific Parcels
   const fetchRiderData = async () => {
     if (!session?.user?.email) return;
     try {
@@ -27,13 +29,13 @@ const RiderDashboard = () => {
     fetchRiderData();
   }, [session]);
 
-  // ২. ফিল্টার লজিক
+  // 2. Logic for filtering tasks
   const activeTasks = allParcels.filter((p: any) => 
     p.delivery_status === "rider-assigned" || p.delivery_status === "transit"
   );
   const deliveredParcels = allParcels.filter((p: any) => p.delivery_status === "delivered");
 
-  // ৩. আর্নিং ক্যালকুলেশন (Database Value অথবা Manual Fallback)
+  // 3. Earnings Calculation with Manual Fallback
   const totalEarnings = deliveredParcels.reduce((sum, p: any) => {
     if (p.riderEarnings && p.riderEarnings > 0) {
       return sum + p.riderEarnings;
@@ -45,7 +47,7 @@ const RiderDashboard = () => {
     return sum + manualCalc;
   }, 0);
 
-  // ৪. একশন হ্যান্ডলার (Pickup/Deliver)
+  // 4. Status Update Actions (Pickup/Deliver)
   const handleAction = async (parcelId: string, action: "pickup" | "deliver") => {
     const isPickup = action === "pickup";
     const result = await Swal.fire({
@@ -95,18 +97,18 @@ const RiderDashboard = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <Toaster />
 
-      {/* ৫. Stats Section */}
+      {/* 5. Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="stat bg-white shadow-md rounded-2xl border border-gray-100">
           <div className="stat-title text-gray-500 font-bold">Total Delivered</div>
           <div className="stat-value text-green-600">{deliveredParcels.length}</div>
-          <div className="stat-desc font-medium">Items completed</div>
+          <div className="stat-desc font-medium">Completed Deliveries</div>
         </div>
         
         <div className="stat bg-white shadow-md rounded-2xl border border-gray-100">
           <div className="stat-title text-gray-500 font-bold">Active Tasks</div>
           <div className="stat-value text-blue-600">{activeTasks.length}</div>
-          <div className="stat-desc font-medium">{activeTasks.length > 0 ? "Items in hand" : "Available for duty"}</div>
+          <div className="stat-desc font-medium">Items to process</div>
         </div>
 
         <div className="stat bg-[#00302E] text-white shadow-md rounded-2xl flex flex-col justify-between">
@@ -125,7 +127,7 @@ const RiderDashboard = () => {
         </div>
       </div>
 
-      {/* ৬. Active Assignments Section */}
+      {/* 6. Active Assignments */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-tight">Active Assignments</h2>
         <button onClick={fetchRiderData} className="btn btn-ghost btn-sm border-gray-300">Refresh</button>
@@ -138,14 +140,22 @@ const RiderDashboard = () => {
               
               <div className="flex justify-between items-center mb-4">
                 <span className="badge badge-lg bg-[#C8E46E] text-[#00302E] border-none font-bold px-4">{p.trackingId}</span>
-                <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${p.delivery_status === 'transit' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
-                  {p.delivery_status.replace('-', ' ')}
-                </span>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setActiveChat(p)} 
+                    className="btn btn-xs btn-outline border-gray-300 text-[#00302E]"
+                  >
+                    💬 Chat
+                  </button>
+                  <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${p.delivery_status === 'transit' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
+                    {p.delivery_status.replace('-', ' ')}
+                  </span>
+                </div>
               </div>
 
               {/* Parcel Details Section */}
               <div className="mb-4 p-3 bg-blue-50 rounded-2xl border border-blue-100">
-                <p className="text-xs font-bold text-blue-800 uppercase tracking-tighter mb-1">Parcel Info</p>
+                <p className="text-xs font-bold text-blue-800 uppercase tracking-tighter mb-1">Parcel Information</p>
                 <div className="flex justify-between text-sm">
                   <span className="font-bold text-gray-700">{p.parcelName}</span>
                   <span className="badge badge-sm bg-blue-200 text-blue-800 border-none font-bold">{p.parcelWeight} kg</span>
@@ -153,26 +163,29 @@ const RiderDashboard = () => {
               </div>
               
               <div className="space-y-4 text-sm mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Pickup Details */}
+                {/* Pickup Side */}
                 <div className="bg-gray-50 p-4 rounded-2xl border">
                   <h3 className="font-bold text-[#00302E] border-b pb-1 mb-2 text-xs uppercase tracking-tighter">Pickup</h3>
-                  <p className="font-bold">Name: {p.senderName}</p>
-                  <p className="font-bold"> {p.senderEmail}</p>
-                  <p className="text-blue-600 font-medium mb-1">Phone: {p.senderPhone || "nai"}</p>
-                  <p className="text-gray-600 text-xs">Address: {p.senderAddress}, {p.senderDistrict}</p>
+                  <p className="font-bold">{p.senderName}</p>
+                  <p className="text-blue-600 font-medium mb-1">📞 {p.senderPhone || "N/A"}</p>
+                  <p className="text-gray-600 text-[11px] leading-tight">
+                    {p.senderAddress}, {p.senderDistrict}
+                  </p>
                   {p.pickupInstruction && (
                     <div className="mt-2 p-2 bg-yellow-50 border border-yellow-100 rounded-lg text-[10px] italic text-gray-500">
-                      <span className="font-bold text-yellow-700 not-italic">Instruction:</span> {p.pickupInstruction}
+                      <span className="font-bold text-yellow-700 not-italic">Note:</span> {p.pickupInstruction}
                     </div>
                   )}
                 </div>
 
-                {/* Drop-off Details */}
+                {/* Drop-off Side */}
                 <div className="bg-gray-50 p-4 rounded-2xl border">
                   <h3 className="font-bold text-[#00302E] border-b pb-1 mb-2 text-xs uppercase tracking-tighter">Drop-off</h3>
-                  <p className="font-bold">Name: {p.receiverName}</p>
-                  <p className="text-blue-600 font-medium mb-1">Phone: {p.receiverPhone}</p>
-                  <p className="text-gray-600 text-xs">Address: {p.receiverAddress}, {p.receiverDistrict}</p>
+                  <p className="font-bold">{p.receiverName}</p>
+                  <p className="text-blue-600 font-medium mb-1">📞 {p.receiverPhone || "N/A"}</p>
+                  <p className="text-gray-600 text-[11px] leading-tight">
+                    {p.receiverAddress}, {p.receiverDistrict}
+                  </p>
                   {p.deliveryInstruction && (
                     <div className="mt-2 p-2 bg-green-50 border border-green-100 rounded-lg text-[10px] italic text-gray-500">
                       <span className="font-bold text-green-700 not-italic">Note:</span> {p.deliveryInstruction}
@@ -202,20 +215,20 @@ const RiderDashboard = () => {
       ) : (
         <div className="p-16 bg-gray-50 rounded-3xl text-center mb-12 border-2 border-dashed border-gray-200">
           <div className="text-5xl mb-4">📦</div>
-          <p className="text-gray-500 font-medium italic">No active assignments. You're ready for new tasks!</p>
+          <p className="text-gray-500 font-medium italic">All clear! No active tasks at the moment.</p>
         </div>
       )}
 
-      {/* ৭. History Section */}
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 uppercase tracking-tight">Earning History</h2>
+      {/* 7. Earning History */}
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 uppercase tracking-tight">Delivery History</h2>
       <div className="overflow-x-auto bg-white rounded-2xl shadow-sm border border-gray-100">
         <table className="table w-full">
           <thead>
             <tr className="bg-gray-50 text-gray-600">
               <th>Tracking ID</th>
-              <th>Destination</th>
+              <th>Recipient</th>
               <th>Parcel</th>
-              <th>Earnings (calc)</th>
+              <th>Earnings</th>
               <th>Date</th>
             </tr>
           </thead>
@@ -250,6 +263,16 @@ const RiderDashboard = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Floating ChatBox Component */}
+      {activeChat && (
+        <ChatBox 
+          parcelId={activeChat._id}
+          senderEmail={session?.user?.email} // Rider is the current sender
+          receiverEmail={activeChat.senderEmail} // Customer is the receiver
+          onClose={() => setActiveChat(null)}
+        />
+      )}
     </div>
   );
 };
