@@ -66,7 +66,7 @@ function CheckoutForm({ parcelId }: Props) {
 
     if (confirm.paymentIntent && confirm.paymentIntent.status === "succeeded") {
       // Optionally update parcel record client-side (server webhook will do this reliably).
-      // You can call your API to set payment_status immediately for UX:
+      
       await fetch(`/api/parcels/payment-update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -14,7 +14,7 @@ export async function GET(req) {
 
     await connectMongoDB();
 
-    // 🔥 Get session from Stripe
+    //  Get session from Stripe
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
     if (session.payment_status !== "paid") {

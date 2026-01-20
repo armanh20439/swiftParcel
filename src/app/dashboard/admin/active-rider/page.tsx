@@ -28,14 +28,14 @@ const ActiveRiders = () => {
       text: "The user will lose rider access and move back to the pending list.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#facc15", // yellow
+      confirmButtonColor: "#facc15", 
       confirmButtonText: "Yes, Deactivate",
     }).then(async (result) => {
       if (result.isConfirmed) {
         const res = await fetch(`/api/admin/riders/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "pending", userId }), // Moves back to pending
+          body: JSON.stringify({ status: "pending", userId }), // set back to pending
         });
 
         if (res.ok) {

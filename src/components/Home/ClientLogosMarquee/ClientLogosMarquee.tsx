@@ -1,7 +1,7 @@
 import React from 'react';
 import Marquee from 'react-fast-marquee';
 
-// import your logos
+
 import amazon from '../../../assets/brands/amazon.png';
 import amazonVec from '../../../assets/brands/amazon_vector.png';
 

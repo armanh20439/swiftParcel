@@ -2,11 +2,7 @@ import mongoose, { Schema, models } from "mongoose";
 
 const riderSchema = new Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", 
-      required: true,
-    },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     age: { type: Number, required: true },
@@ -21,7 +17,7 @@ const riderSchema = new Schema(
       default: "pending",
       enum: ["pending", "approved", "rejected"],
     },
-    withdrawnAmount: { type: Number, default: 0 },
+    withdrawnAmount: { type: Number, default: 0 }, 
     workStatus: {
       type: String,
       default: "available",

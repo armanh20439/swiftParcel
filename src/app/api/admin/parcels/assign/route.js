@@ -8,13 +8,13 @@ export async function PATCH(req) {
     await connectMongoDB();
     const { parcelId, riderId, riderName, riderEmail } = await req.json();
 
-    // ১. রাইডার প্রোফাইল এবং আইডি চেক করা
+    // check rider profile by id
     const rider = await Rider.findById(riderId);
     if (!rider) {
       return NextResponse.json({ message: "Rider not found" }, { status: 404 });
     }
 
-    // ২. রাইডার বর্তমানে অন্য ডেলিভারিতে ব্যস্ত কি না তা যাচাই করা
+    // check rider are busy or not
     if (rider.workStatus === "in-delivery") {
       return NextResponse.json(
         { message: "Rider is currently busy with another delivery!" },
@@ -22,12 +22,12 @@ export async function PATCH(req) {
       );
     }
 
-    // ৩. পার্সেল আপডেট (ফ্লো-চার্ট অনুযায়ী স্ট্যাটাস: rider-assigned)
+    // update parcel for rider assigned status
     const updatedParcel = await Parcel.findByIdAndUpdate(
       parcelId,
       {
         $set: { 
-          // স্ট্যাটাস এখন সরাসরি 'transit' হবে না
+         
           delivery_status: "rider-assigned", 
           riderId: riderId,
           riderInfo: {
@@ -44,7 +44,7 @@ export async function PATCH(req) {
       return NextResponse.json({ message: "Parcel assignment failed" }, { status: 404 });
     }
 
-    // ৪. রাইডারের কাজের স্ট্যাটাস আপডেট করা (যাতে অন্য কেউ তাকে এসাইন না করতে পারে)
+    // update rider status for admin donot assigned him another work
     await Rider.findByIdAndUpdate(riderId, { 
       $set: { workStatus: "in-delivery" } 
     });

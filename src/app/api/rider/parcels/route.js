@@ -18,7 +18,7 @@ export async function GET(req) {
       return NextResponse.json({ message: "Rider not found" }, { status: 404 });
     }
 
-    // ডেলিভারি হওয়া পার্সেলসহ সব এসাইন করা পার্সেল ফেচ করা
+    // assign, deliver, tansit parcel are fetch
     const allAssignedParcels = await Parcel.find({ 
       riderId: rider._id.toString(), 
       delivery_status: { $in: ["rider-assigned", "transit", "delivered"] } 
@@ -49,35 +49,35 @@ export async function PATCH(req) {
         pickedUpAt: new Date() 
       };
     } else if (action === "deliver") {
-      // 🔥 আর্নিং রুলস ফিক্স: Case-insensitive তুলনা এবং স্পেস রিমুভ করা
+      // earning rule fixed, Case-insensitive copmpare and remoev space
       const senderDist = String(parcel.senderDistrict || "").trim().toLowerCase();
       const receiverDist = String(parcel.receiverDistrict || "").trim().toLowerCase();
       
       const isSameDistrict = senderDist === receiverDist;
       
-      // আর্নিং পার্সেন্টেজ নির্ধারণ
+      // rider earning percent 
       const earningsPercentage = isSameDistrict ? 0.80 : 0.30;
       
-      // কস্ট নিশ্চিত করে ক্যালকুলেট করা
+      // cost decide 
       const parcelCost = Number(parcel.cost) || 0;
       const calculatedEarnings = parcelCost * earningsPercentage;
 
       updateData = { 
         delivery_status: "delivered", 
         deliveredAt: new Date(),
-        // ২ দশমিক পর্যন্ত সঠিক নাম্বার হিসেবে সেভ করা
+        
         riderEarnings: parseFloat(calculatedEarnings.toFixed(2)) 
       };
     }
 
-    // ১. পার্সেল আপডেট (Status, Date and Earnings)
+    
     const updatedParcel = await Parcel.findByIdAndUpdate(
       parcelId, 
       { $set: updateData },
       { new: true }
     );
 
-    // ২. রাইডারকে আবার 'available' করা
+    // make rider available again
     if (action === "deliver") {
       await Rider.findOneAndUpdate(
         { email: riderEmail },

@@ -2,11 +2,11 @@ import { connectMongoDB } from "../../../../lib/mongodb";
 import Rider from "../../../../models/rider";
 import { NextResponse } from "next/server";
 
-// ১. সকল রাইডার অ্যাপ্লিকেশন ডাটাবেস থেকে নিয়ে আসা (GET)
+
 export async function GET() {
   try {
     await connectMongoDB();
-    // সব রাইডার ডাটা নিয়ে আসছি (সদ্য করা আবেদনগুলো আগে দেখাবে)
+    // show new rider in sort
     const riders = await Rider.find().sort({ createdAt: -1 });
     return NextResponse.json(riders);
   } catch (error) {
@@ -14,7 +14,7 @@ export async function GET() {
   }
 }
 
-// ২. নতুন রাইডার অ্যাপ্লিকেশনের জন্য (POST - আপনার আগের কোড)
+
 export async function POST(req) {
   try {
     const data = await req.json();

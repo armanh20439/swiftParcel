@@ -76,7 +76,7 @@ const AllUsersPage = () => {
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
         
-        {/* 🔍 Search Bar Input */}
+        {/*  Search Bar Input */}
         <div className="relative w-full md:w-96">
           <input
             type="text"

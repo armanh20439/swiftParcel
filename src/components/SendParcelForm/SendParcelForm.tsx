@@ -35,14 +35,14 @@ const SendParcel = () => {
       parcelWeight: "",
       senderName: "",
       senderEmail: "",
-      senderPhone: "", // Added
+      senderPhone: "", 
       senderRegion: "",
       senderDistrict: "",
       senderAddress: "",
       pickupInstruction: "",
       receiverName: "",
       receiverEmail: "",
-      receiverPhone: "", // Added
+      receiverPhone: "", 
       receiverRegion: "",
       receiverDistrict: "",
       receiverAddress: "",
@@ -117,7 +117,7 @@ const SendParcel = () => {
       assignedAt: null,
       pickedUpAt: null,
       deliveredAt: null,
-      riderEarnings: 0 // Added default
+      riderEarnings: 0 
     };
 
     // Confirm price breakdown with user

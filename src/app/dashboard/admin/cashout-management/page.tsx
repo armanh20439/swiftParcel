@@ -7,10 +7,10 @@ const CashoutManagement = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ১. সব ক্যাশআউট রিকোয়েস্ট লোড করা
+  // load all cashout request
   const fetchRequests = async () => {
     try {
-      const res = await fetch("/api/admin/cashout"); // এই API টি সব রিকোয়েস্ট রিটার্ন করবে
+      const res = await fetch("/api/admin/cashout"); // return all request
       const data = await res.json();
       setRequests(data);
     } catch (err) {
@@ -24,7 +24,7 @@ const CashoutManagement = () => {
     fetchRequests();
   }, []);
 
-  // ২. রিকোয়েস্ট অ্যাপ্রুভ করার হ্যান্ডলার
+  // request approve
   const handleApprove = async (request: any) => {
     const confirm = await Swal.fire({
       title: "Confirm Payment?",
@@ -49,7 +49,7 @@ const CashoutManagement = () => {
 
         if (res.ok) {
           Swal.fire("Success", "Cashout approved and balance updated!", "success");
-          fetchRequests(); // লিস্ট রিফ্রেশ করা
+          fetchRequests(); //refresh the list
         }
       } catch (error) {
         toast.error("Something went wrong");

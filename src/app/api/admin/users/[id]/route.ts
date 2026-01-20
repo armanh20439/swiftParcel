@@ -2,13 +2,11 @@ import { connectMongoDB } from "../../../../../../lib/mongodb";
 import User from "../../../../../../models/user";
 import { NextResponse } from "next/server";
 
-// DELETE User from MongoDB
-// DELETE User from MongoDB
+//user delete from database
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectMongoDB();
     
-    // 🔥 FIX: Await the params to unwrap the ID
     const resolvedParams = await params;
     const id = resolvedParams.id;
 
@@ -25,12 +23,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   }
 }
 
-// UPDATE User Role in MongoDB
+// UPDATE User Role 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectMongoDB();
     
-    // 🔥 FIX: Await the params to unwrap the ID
+    
     const resolvedParams = await params;
     const id = resolvedParams.id;
     

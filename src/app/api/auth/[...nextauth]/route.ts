@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!user) return null;
 
-          // If user exists but registered via Google (no password)
+          // If user exists but registered via Google 
           if (!user.password) {
             throw new Error("This account is linked with Google. Please login with Google.");
           }

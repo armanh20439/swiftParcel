@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function PATCH(req, { params }) {
   try {
     await connectMongoDB();
-    // In Next.js 15+, await params
+ 
     const resolvedParams = await params;
     const { id } = resolvedParams;
     const { status, userId } = await req.json();
@@ -22,7 +22,7 @@ export async function PATCH(req, { params }) {
     if (status === "approved" && userId) {
       await User.findByIdAndUpdate(userId, { role: "rider" });
     } 
-    // If rejected, you might want to ensure the role stays 'user' (optional)
+    // If rejected,  role stays 'user' 
     else if (status === "rejected" && userId) {
       await User.findByIdAndUpdate(userId, { role: "user" });
     }else {

@@ -35,7 +35,7 @@ const RegisterForm = () => {
     
     try {
       
-      // after login successful data will save in database
+      // after register  data will save in database
       await signIn("google", { callbackUrl: "/dashboard",redirect: true, }); 
       
     } catch (error) {

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const CashoutRequestSchema = new mongoose.Schema({
   riderId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Rider", // রাইডার মডেলের সাথে লিংক করা
+    ref: "Rider", 
     required: true,
   },
   riderName: {
@@ -25,18 +25,18 @@ const CashoutRequestSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    default: "Bkash/Nagad", // আপনি চাইলে এটি ডাইনামিক করতে পারেন
+    default: "card/Bkash/Nagad", 
   },
   transactionId: {
     type: String,
-    default: "", // অ্যাডমিন পেমেন্ট করার পর এখানে ট্রানজেকশন আইডি বসাবে
+    default: "", 
   },
   requestedAt: {
     type: Date,
     default: Date.now,
   },
   processedAt: {
-    type: Date, // অ্যাডমিন যখন এপ্রুভ বা রিজেক্ট করবে
+    type: Date, // 
   }
 }, { timestamps: true });
 

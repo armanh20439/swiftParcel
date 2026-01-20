@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     await connectMongoDB();
-    // পাসওয়ার্ড বাদে সব ইউজার ডাটা নিয়ে আসা হচ্ছে
+    // find all user info without password
     const users = await User.find().select("-password");
     return NextResponse.json(users);
   } catch (error) {

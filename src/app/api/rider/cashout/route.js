@@ -8,16 +8,16 @@ export async function POST(req) {
     await connectMongoDB();
     const { riderEmail, amount } = await req.json();
 
-    // রাইডার খুঁজে বের করা
+    // find rider
     const rider = await Rider.findOne({ email: riderEmail });
     
-    // ক্যাশআউট রিকোয়েস্ট তৈরি করা
+    // make cashout request
     const newRequest = await CashoutRequest.create({
       riderId: rider._id,
       riderName: rider.name,
       riderEmail: riderEmail,
       amount: amount,
-      status: "pending", // প্রাথমিক স্ট্যাটাস
+      status: "pending", // primary status
       requestedAt: new Date()
     });
 

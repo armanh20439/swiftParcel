@@ -18,7 +18,7 @@ interface CoverageItem {
 const BeARider = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  
+  // use react hook form
   const {
     register,
     handleSubmit,
@@ -42,7 +42,7 @@ const BeARider = () => {
 
   const [serviceCenters, setServiceCenters] = useState<CoverageItem[]>([]);
 
-  // 1. Fetch Coverage Data
+ 
   useEffect(() => {
     fetch("/data/coverageData.json")
       .then((res) => res.json())
@@ -57,14 +57,14 @@ const BeARider = () => {
     }
   }, [session, setValue]);
 
-  // 3. Page Protection
+  //  Page Protection
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
 
-  // 4. Watch Region to filter District
+  //  Watch Region to filter District
   const selectedRegion = useWatch({ control, name: "region" });
   const regions = [...new Set(serviceCenters.map((c) => c.region))];
 
@@ -78,7 +78,7 @@ const BeARider = () => {
       userId: (session?.user as any)?.id, 
       email: session?.user?.email, 
       status: "pending",
-      workStatus: "available", // 🔥 মডেলে আপডেট করার জন্য ডিফল্ট ভ্যালু যোগ করা হলো
+      workStatus: "available", 
     };
 
     Swal.fire({

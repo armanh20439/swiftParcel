@@ -4,7 +4,7 @@ import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation"; // useSearchParams ইমপোর্ট করুন
+import { useRouter, useSearchParams } from "next/navigation"; 
 import Link from "next/link";
 
 const Loginform = () => {
@@ -20,13 +20,13 @@ const Loginform = () => {
   } = useForm<FormValues>();
 
   const router = useRouter();
-  const searchParams = useSearchParams(); // URL প্যারামিটার পাওয়ার হুক
+  const searchParams = useSearchParams(); // url find by next/navigation
   const [loginError, setLoginError] = React.useState("");
 
-  // ✅ callbackUrl টি এখানে ডিফাইন করুন যাতে দুই জায়গাতেই ব্যবহার করা যায়
-  const callbackUrl = searchParams.get("callbackUrl") || "/userDetails";
 
-  // ✅ Email/Password Submit Handler
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+
+  // Email/Password Submit 
   const onSubmit = async (data: FormValues) => {
     console.log("Login data:", data.email);
     
@@ -35,16 +35,16 @@ const Loginform = () => {
         email: data.email,
         password: data.password,
         redirect: false,
-        callbackUrl: callbackUrl, // আপনার কোডে এখানে বানান ভুল ছিল (allbackUrl)
+        callbackUrl: callbackUrl, 
       });
 
       if (res?.error) {
         setLoginError("Invalid email or password");
-        // router.replace(callbackUrl); // ❌ ভুল: এরর হলে রিডাইরেক্ট করবেন না, ইউজারকে এরর দেখতে দিন।
+        // router.replace(callbackUrl); 
         return;
       }
 
-      // লগইন সফল হলে রিডাইরেক্ট
+      // if login complete redirect page where user wants
       router.replace(callbackUrl);
     } catch (error) {
       console.log(error);
@@ -52,9 +52,9 @@ const Loginform = () => {
     }
   };
 
-  // ✅ Google Login Handler
+  //  Google Login 
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: callbackUrl }); // এখানে callbackUrl পাস করতে হবে
+    signIn("google", { callbackUrl: callbackUrl }); 
   };
 
   return (
@@ -136,7 +136,7 @@ const Loginform = () => {
 
         {/* Google Button */}
         <button
-          onClick={handleGoogleLogin} // নতুন ফাংশনটি কল করা হলো
+          onClick={handleGoogleLogin} 
           type="button"
           className="w-full flex items-center justify-center gap-2 border py-2 rounded-md hover:bg-gray-100 transition"
         >

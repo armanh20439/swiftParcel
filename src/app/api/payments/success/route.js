@@ -15,19 +15,19 @@ export async function GET(req) {
 
     await connectMongoDB();
 
-    // 1. Verify Stripe Session Status
+    //  Verify Stripe Session Status
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status !== "paid") {
       return NextResponse.json({ message: "Payment not completed" });
     }
 
-    // 2. Update Parcel → payment_status paid
+    // Update Parcel → payment_status paid
     await Parcel.findByIdAndUpdate(parcelId, {
       payment_status: "paid",
     });
 
-    // 3. Update Payment table
+    //  Update Payment table
     await Payment.findOneAndUpdate(
       { sessionId },
       {

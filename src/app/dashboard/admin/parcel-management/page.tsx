@@ -88,7 +88,7 @@ const ParcelManagement = () => {
                     </thead>
                     <tbody>
                         {parcels.map((parcel: any) => {
-                            // 🔥 Logic: Filter riders who belong to the parcel's sender district
+                            //   Filter riders who belong to the parcel's sender district
                             const localRiders = riders.filter((r: any) => 
                                 (r.district || "").toLowerCase().trim() === (parcel.senderDistrict || "").toLowerCase().trim()
                             );

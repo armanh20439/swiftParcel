@@ -12,7 +12,7 @@ const ChatBox = ({ parcelId, senderEmail, receiverEmail, onClose }: any) => {
   const [newMessage, setNewMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // ১. মেসেজ ফেচ করা (Polling)
+  
   const fetchMessages = async () => {
     try {
       const res = await fetch(`/api/chat?parcelId=${parcelId}`);
@@ -25,16 +25,16 @@ const ChatBox = ({ parcelId, senderEmail, receiverEmail, onClose }: any) => {
 
   useEffect(() => {
     fetchMessages();
-    const interval = setInterval(fetchMessages, 3000); // প্রতি ৩ সেকেন্ড পর পর আপডেট হবে
+    const interval = setInterval(fetchMessages, 3000); // update after 3 sec
     return () => clearInterval(interval);
   }, [parcelId]);
 
-  // অটো স্ক্রল ডাউন
+  // auto scroll for msg
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ২. মেসেজ পাঠানো
+  // send msg
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;

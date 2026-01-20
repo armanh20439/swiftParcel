@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await connectMongoDB();
     
-    // সব রিকোয়েস্ট নিয়ে আসা এবং নতুনগুলো উপরে রাখা
+    // show all cashout request, show new request in the up
     const requests = await CashoutRequest.find().sort({ createdAt: -1 });
     
     return NextResponse.json(requests);

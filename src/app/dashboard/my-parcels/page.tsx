@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import Swal from "sweetalert2";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import ChatBox from "@/components/Chat/ChatBox"; // Ensure you have created this component
+import ChatBox from "@/components/Chat/ChatBox"; 
 
 export interface ParcelType {
   _id: string;

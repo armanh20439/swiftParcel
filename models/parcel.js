@@ -7,7 +7,7 @@ const ParcelSchema = new mongoose.Schema({
 
   senderName: String,
   senderEmail: String,
-  senderPhone: String, // Added sender phone number
+  senderPhone: String, 
   senderRegion: String,
   senderDistrict: String,
   senderAddress: String,
@@ -15,7 +15,7 @@ const ParcelSchema = new mongoose.Schema({
 
   receiverName: String,
   receiverEmail: String,
-  receiverPhone: String, // Added receiver phone number
+  receiverPhone: String, 
   receiverRegion: String,
   receiverDistrict: String,
   receiverAddress: String,
